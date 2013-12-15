@@ -58,7 +58,7 @@
 
 body {
   font-size: 16px;
-  line-height: 24px;
+  line-height: 1.5;
   font-family: "Sorts Mill Goudy", "Adobe Garamond", "Garamond", Palatino, serif;
   font-weight: 400;
 }
@@ -92,7 +92,7 @@ body {
 
 a:link,
 a:visited {
-  color: #1478ac;
+  color: #0088cc;
   text-decoration: none;
 }
 
@@ -434,7 +434,7 @@ table {
 }
 
 body {
-  background: #1478ac;
+  background: #0088cc;
   color: #fff;
 }
 
@@ -454,7 +454,8 @@ body {
 }
 .contrast h2,
 .contrast h3,
-.contrast p {
+.contrast p,
+.contrast li {
   color: #333333;
 }
 
@@ -468,7 +469,7 @@ body {
 }
 
 header {
-  background: #1478ac;
+  background: #0088cc;
   color: #fff;
   padding: 10px 0;
 }
