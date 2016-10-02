@@ -30,13 +30,13 @@ GroupFinances.Model = Backbone.Model.extend({
   // },
 
   parseBMF: function(data) {
-    data.total_assets = numeral(data.total_assets).format('0,0[.]00');
-    data.total_expenses = numeral(data.total_expenses).format('0,0[.]00');
-    data.total_revenue = numeral(data.total_revenue).format('0,0[.]00');
-    data.total_liabilities = numeral(data.total_liabilities).format('0,0[.]00');
+    data.total_assets_text = numeral(data.total_assets).format('0,0[.]00');
+    data.total_expenses_text = numeral(data.total_expenses).format('0,0[.]00');
+    data.total_revenue_text = numeral(data.total_revenue).format('0,0[.]00');
+    data.total_liabilities_text = numeral(data.total_liabilities).format('0,0[.]00');
 
     if (data.grants_paid) {
-      data.grants_paid = numeral(data.grants_paid).format('0,0[.]00');
+      data.grants_paid_text = numeral(data.grants_paid).format('0,0[.]00');
     }
 
     data.year = Number(data.tax_period.substring(0, 4));
@@ -62,7 +62,9 @@ GroupFinances.Collection = Backbone.Collection.extend({
     _.bindAll(this, 'parse', 'url', 'toJSON');
     console.log("Init group finances", options);
     this.eins = options.eins;
-    this.fetch({reset: true});
+    this.fetch({
+      reset: true
+    });
   },
 
   url: function() {
