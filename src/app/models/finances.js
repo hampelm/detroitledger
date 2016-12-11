@@ -1,3 +1,5 @@
+'use strict';
+
 var $ = require('jquery'),
     Backbone = require('backbone'),
     _ = require('lodash'),
@@ -42,17 +44,17 @@ Finances.Model = Backbone.Model.extend({
     data.year = data.tax_period.substring(0, 4);
     data.month = Number(data.tax_period.substring(4));
     data.month = months[data.month];
-    console.log("XXX Parsed", data.tax_period.substring(0, 4));
     return data;
   }
 });
+
 
 Finances.Collection = Backbone.Collection.extend({
   model: Finances.Model,
 
   initialize: function(options) {
     _.bindAll(this, 'parse', 'url', 'toJSON');
-    console.log("Init finances", options);
+    console.log('Init finances', options);
     this.ein = options.ein;
     this.fetch({reset: true});
   },

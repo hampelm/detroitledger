@@ -1,3 +1,5 @@
+'use strict';
+
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -13,42 +15,51 @@ var $ = require('jquery'),
 var NTEEChartView = Backbone.View.extend({
   //template: template,
 
-  initialize: function(options) {
+  initialize: function() {
     _.bindAll(this, 'render');
     this.collection.bind('reset', this.render);
   },
 
-  render: function() {
-    console.log("XXX Rendering NTEE chart", this.collection.toJSON());
-    
-    var data = this.collection.toJSON();
-    var revenues = [];
-    data.forEach(function(org) {
-      // XXX TODO we need to have a better info object join here.
-      if (!org.info) {
-        console.log("Skipping, no info", org);
-        return;
-      }
+  get: function(org, field) {  
+     // XXX TODO we need to have a better info object join here.
+    if (!org.info) {
+      // console.log('Skipping, no info', org);
+      return;
+    }
 
-      var series = {
-        name: org.info.NAME,
-        data: []
-      };
+    var series = {
+      name: org.info.NAME,
+      data: []
+    };
 
-      org.data.forEach(function(year) {
-        var date = moment(year.year + '-' + year.month + '-01').endOf('month');
-        series.data.push([Date.UTC(year.year, year.month, 1), Number(year.total_revenue)]);
-      });
-
-      // console.log("Got series", series);
-      revenues.push(series);
+    org.data.forEach(function(year) {
+      // var date = moment(year.year + '-' + year.month + '-01').endOf('month');
+      series.data.push([Date.UTC(year.year, year.month, 1), Number(year[field])]);
     });
 
+    // console.log("Got series", series);
+    return series;
+  },
 
-    var colors = tinycolor("#70c6ff", revenues.length).analogous();
+  getRevenues: function(org) {
+    return this.get(org, 'total_revenue');
+  },
+
+  getExpenses: function(org) {
+    return this.get(org, 'total_expenses');
+  },
+
+  getAssets: function(org) {
+    return this.get(org, 'total_assets');
+  },
+
+  makeChart: function(slug, series) {
+    var colors = tinycolor('#27a9ff', series.length).analogous();
     colors = colors.map(function(t) { return t.toHexString(); });
 
-    $('.chart-revenue').highcharts({
+    series = _.filter(series, undefined);
+
+    $('.chart-' + slug).highcharts({
       chart: {
         type: 'spline'
       },
@@ -68,7 +79,7 @@ var NTEEChartView = Backbone.View.extend({
         pointFormatter: function() {
           return this.series.name + ': $' + numeral(this.y).format('0,0[.]00');
         },
-        //shared: true,
+        // shared: true,
         split: true,
         distance: 30,
         padding: 5
@@ -110,19 +121,33 @@ var NTEEChartView = Backbone.View.extend({
         type: 'logarithmic'
       },
       plotOptions: {
-          spline: {
-              marker: {
-                  enabled: true
-              }
+        spline: {
+          lineWidth: 1,
+          marker: {
+            enabled: true,
+            radius: 4,
+            lineColor: '#fff',
+            lineWidth: 1
           }
+        }
       },
-      series: revenues,
-      colors: colors
+      series: series,
+      colors: colors,
+      credits: {
+        enabled: false
+      }
     });
-    
-    // this.$el.html(this.template({
-    //   organizations: this.collection.toJSON()
-    // }));
+  },
+
+  render: function() {    
+    var data = this.collection.toJSON();
+    var revenues = data.map(this.getRevenues.bind(this));
+    var expenses = data.map(this.getExpenses.bind(this));
+    var assets = data.map(this.getAssets.bind(this));
+
+    this.makeChart('revenues', revenues);
+    this.makeChart('expenses', expenses);
+    this.makeChart('assets', assets);
   }
 });
 
