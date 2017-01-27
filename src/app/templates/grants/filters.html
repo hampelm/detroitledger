@@ -7,7 +7,7 @@
 <select class="filterbytag" name="filterbytag">
   <option value="" selected>Filter by grant tag</option>
   <% _.each(grant_tags, function(tag) { %>
-  <option value="<%= tag.id %>"><%= tag.name.substring(0, 70) %></option>
+  <option value="<%= tag.id %>"><%= tag.name.substring(0, 70) %> (<%= tag.count %>)</option>
   <% }); %>
 </select>
 
