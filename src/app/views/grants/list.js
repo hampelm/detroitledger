@@ -17,7 +17,7 @@ var GrantListView = Backbone.View.extend({
     this.direction = options.direction;
     this.$el = options.$parent || $(options.el);
 
-    this.reportGrantTags = options.reportGrantTags;
+    this.reportGrantTags = options.reportGrantTags || function() {};
 
     this.collection.on('reset', this.render);
   },
