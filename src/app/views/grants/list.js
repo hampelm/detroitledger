@@ -17,6 +17,8 @@ var GrantListView = Backbone.View.extend({
     this.direction = options.direction;
     this.$el = options.$parent || $(options.el);
 
+    this.reportGrantTags = options.reportGrantTags;
+
     this.collection.on('reset', this.render);
   },
 
@@ -50,14 +52,24 @@ var GrantListView = Backbone.View.extend({
     // Add counts etc.
     var readyData = [];
     var yearly_sums = {};
+    var grant_tags = {};
     _.each(byOrganizationID, function(grants, organziation_id) {
       var sum = _.reduce(grants, function(memo, grant) {
-        // along the way, build our yearly sums!
+        // along the way, build our yearly sums & grant tags.
         var this_year = grant.field_year.value.slice(0,4);
         if (yearly_sums[this_year] > 0) {
           yearly_sums[this_year] += grant.field_funded_amount;
         } else {
           yearly_sums[this_year] = grant.field_funded_amount;
+        }
+        if (grant.field_grant_tags && grant.field_grant_tags.hasOwnProperty('und')) {
+          _.forEach(grant.field_grant_tags.und, function(grant_tag) {
+            grant_tags[grant_tag.tid] = {
+              name: grant_tag.name,
+              id: grant_tag.tid,
+              count: grant_tags[grant_tag.tid] ? grant_tags[grant_tag.tid].count + 1 : 1,
+            };
+          });
         }
         return memo + grant.field_funded_amount;
       }, 0);
@@ -78,7 +90,8 @@ var GrantListView = Backbone.View.extend({
 
     return {
       organizations: readyData,
-      yearly_sums: yearly_sums
+      yearly_sums: yearly_sums,
+      grant_tags: _.reverse(_.sortBy(_.values(grant_tags), 'count'))
     };
   },
 
@@ -87,6 +100,8 @@ var GrantListView = Backbone.View.extend({
     this.$el.html(this.template({
       organizations: this.preppedData.organizations
     }));
+
+    this.reportGrantTags(this.preppedData.grant_tags);
 
     return this;
   }

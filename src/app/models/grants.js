@@ -69,6 +69,7 @@ Grants.Collection = Backbone.Collection.extend({
       var value;
       var hasName = true;
       var hasDescription = true;
+      var hasTag = true;
 
       if (filters.org_funded_name) {
         value = filters.org_funded_name.toLowerCase();
@@ -88,7 +89,14 @@ Grants.Collection = Backbone.Collection.extend({
         }
       }
 
-      if (hasName && hasDescription) {
+      if (filters.tag) {
+        hasTag = false;
+        if (grant.field_grant_tags && grant.field_grant_tags.hasOwnProperty('und')) {
+          hasTag = typeof grant.field_grant_tags.und[filters.tag] !== 'undefined';
+        }
+      }
+
+      if (hasName && hasDescription && hasTag) {
         return grant;
       }
     });
